@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analyze Food | Healthy Living</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg fixed-top navbar-transparent scrolled" id="mainNav">
+    <div class="container-fluid px-4 px-lg-5">
+      <a class="navbar-brand" href="/">Healthy Living</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav align-items-center gap-2 gap-lg-3">
+          <li class="nav-item"><a class="nav-link" href="/#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="/#nutrition-tips">Nutrition Tips</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/analyze">Analyze Food</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <section class="analyze-section py-5" style="padding-top: 7rem !important;">
+    <div class="container py-5">
+      <div class="text-center mb-5">
+        <span class="section-label text-uppercase text-accent fw-600 letter-spacing">AI-Powered</span>
+        <h1 class="section-title mt-2 mb-3">Analyze Your Food</h1>
+        <p class="section-desc text-muted mx-auto" style="max-width: 560px;">Upload an image of your food. Our ResNet model will verify it and show nutritional information and calories.</p>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="analyze-card rounded-4 shadow-soft p-4 p-lg-5 bg-white">
+            <form action="/analyze" method="post" enctype="multipart/form-data" id="uploadForm">
+              <div class="upload-zone rounded-4 border-2 border-dashed d-flex flex-column align-items-center justify-content-center p-5 text-center mb-4" id="uploadZone">
+                <input type="file" name="file" id="foodImageInput" accept="image/*" class="d-none" required>
+                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                <span class="text-muted mb-1">Click or drag to upload your food image</span>
+                <small class="text-muted">PNG, JPG up to 10MB</small>
+              </div>
+              <div class="preview-wrap text-center mb-4 d-none" id="previewWrap">
+                <img id="previewImage" src="" alt="Preview" class="img-fluid rounded-3 shadow-soft mb-2" style="max-height: 280px;">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="clearPreview">Change image</button>
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary-cta btn-lg rounded-pill px-4" id="analyzeBtn" disabled>
+                  <i class="fas fa-search me-2"></i>Analyze with AI
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function () {
+      var input = document.getElementById('foodImageInput');
+      var zone = document.getElementById('uploadZone');
+      var preview = document.getElementById('previewImage');
+      var previewWrap = document.getElementById('previewWrap');
+      var clearBtn = document.getElementById('clearPreview');
+      var analyzeBtn = document.getElementById('analyzeBtn');
+
+      function onFileSelect(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          preview.src = reader.result;
+          previewWrap.classList.remove('d-none');
+          zone.classList.add('d-none');
+          analyzeBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      zone.addEventListener('click', function () { input.click(); });
+      zone.addEventListener('dragover', function (e) { e.preventDefault(); zone.classList.add('upload-dragover'); });
+      zone.addEventListener('dragleave', function () { zone.classList.remove('upload-dragover'); });
+      zone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        zone.classList.remove('upload-dragover');
+        var file = e.dataTransfer.files[0];
+        if (file) {
+          var dt = new DataTransfer();
+          dt.items.add(file);
+          input.files = dt.files;
+          onFileSelect(file);
+        }
+      });
+      input.addEventListener('change', function () { onFileSelect(input.files[0]); });
+
+      clearBtn.addEventListener('click', function () {
+        input.value = '';
+        preview.src = '';
+        previewWrap.classList.add('d-none');
+        zone.classList.remove('d-none');
+        analyzeBtn.disabled = true;
+      });
+    })();
+  </script>
+</body>
+</html>
